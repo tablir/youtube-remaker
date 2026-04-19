@@ -1,0 +1,20 @@
+# Data and Media
+/data/
+*.mp4
+*.mp3
+*.jpg
+*.png
+*.srt
+
+# Secrets
+.env
+config/secrets.json
+*.key
+
+# Temporary
+temp/
+__pycache__/
+*.pyc
+
+# n8n Data
+.n8n/
