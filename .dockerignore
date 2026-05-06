@@ -1,1 +1,49 @@
+# ============================================
+# YouTube Remaker — .dockerignore
+# ============================================
 
+# Git
+.git
+.gitignore
+
+# Secrets
+.env
+*.key
+*.pem
+
+# Data directories (too large)
+/data/
+output/
+cache/
+temp/
+logs/
+
+# Media files
+*.mp4
+*.mp3
+*.wav
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Docs (not needed in container)
+docs/
+*.md
+
+# Tests (not needed in container)
+tests/
+
+# n8n workflows (mounted separately)
+workflows/
