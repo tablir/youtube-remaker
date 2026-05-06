@@ -1,0 +1,70 @@
+# Dockerfile.whisper
+# Audio transcription service for YouTube Remaker pipeline
+# Exposes FastAPI HTTP endpoint for n8n to call
+# faster-whisper medium model, CPU optimized with int8 quantization
+
+FROM python:3.12-slim
+
+# Avoid interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Whisper settings
+ENV WHISPER_MODEL=medium
+ENV WHISPER_DEVICE=cpu
+ENV WHISPER_COMPUTE_TYPE=int8
+
+# Model cache directory — persisted via Docker volume
+ENV HF_HOME=/data/models/whisper
+ENV TRANSFORMERS_CACHE=/data/models/whisper
+
+# ============================================
+# Install system dependencies
+# ============================================
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    curl \
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# ============================================
+# Install Python packages
+# ============================================
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    faster-whisper>=1.0.0 \
+    ctranslate2>=4.0.0 \
+    fastapi>=0.110.0 \
+    uvicorn>=0.29.0 \
+    python-multipart>=0.0.9 \
+    tqdm>=4.66.0
+
+# ============================================
+# Create directory structure
+# ============================================
+RUN mkdir -p \
+    /app \
+    /data/models/whisper \
+    /data/output \
+    /data/temp
+
+WORKDIR /app
+
+# ============================================
+# Copy FastAPI app
+# ============================================
+COPY scripts/transcribe.py /app/transcribe.py
+
+# ============================================
+# Verify installation
+# ============================================
+RUN python3 -c "import faster_whisper; print('faster-whisper OK:', faster_whisper.__version__)" && \
+    python3 -c "import fastapi; print('FastAPI OK:', fastapi.__version__)"
+
+# Expose HTTP port for n8n
+EXPOSE 8080
+
+# Start FastAPI server
+CMD ["uvicorn", "transcribe:app", "--host", "0.0.0.0", "--port", "8080"]
