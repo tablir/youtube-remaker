@@ -1,0 +1,77 @@
+# traefik.yml
+# Traefik static configuration for YouTube Remaker pipeline
+# Place at: /data/traefik/traefik.yml
+
+# ============================================
+# Global settings
+# ============================================
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# ============================================
+# Logging
+# ============================================
+log:
+  level: WARN
+  format: json
+
+accessLog:
+  format: json
+  filters:
+    statusCodes:
+      - "400-599"  # Log errors only — not every request
+
+# ============================================
+# API dashboard (disabled in production)
+# ============================================
+api:
+  dashboard: false
+  insecure: false
+
+# ============================================
+# Entry points
+# ============================================
+entryPoints:
+  web:
+    address: ":80"
+    # Redirect all HTTP to HTTPS
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+
+# ============================================
+# Certificate resolver (Let's Encrypt)
+# ============================================
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "${ACME_EMAIL}"
+      storage: /acme.json
+      # HTTP challenge — works without DNS access
+      httpChallenge:
+        entryPoint: web
+
+# ============================================
+# Providers
+# ============================================
+providers:
+  # Docker provider — reads labels from containers
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: proxy
+
+  # File provider — for additional static routes if needed
+  file:
+    directory: /etc/traefik/conf.d
+    watch: true
