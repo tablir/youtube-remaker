@@ -1,0 +1,89 @@
+# Dockerfile.pipeline
+# CLI tools container for YouTube Remaker pipeline
+# Includes: yt-dlp, ffmpeg, edge-tts, gallery-dl, imagemagick, python
+
+FROM python:3.12-slim
+
+# Avoid interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# ============================================
+# Install system dependencies
+# ============================================
+RUN apt-get update && apt-get install -y \
+    # FFmpeg for video processing
+    ffmpeg \
+    # ImageMagick for thumbnail processing
+    imagemagick \
+    # Fonts for ImageMagick text overlays and FFmpeg subtitles
+    fonts-liberation \
+    fonts-dejavu-core \
+    fontconfig \
+    # Network tools
+    curl \
+    wget \
+    # File tools
+    unzip \
+    # Required for gallery-dl and yt-dlp
+    ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && fc-cache -f -v
+
+# ============================================
+# Fix ImageMagick policy
+# Allow large files and all formats for thumbnail processing
+# ============================================
+RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' \
+    /etc/ImageMagick-6/policy.xml 2>/dev/null || true && \
+    sed -i 's/<policy domain="resource" name="memory" value=".*"\/>/<policy domain="resource" name="memory" value="2GiB"\/>/' \
+    /etc/ImageMagick-6/policy.xml 2>/dev/null || true && \
+    sed -i 's/<policy domain="resource" name="disk" value=".*"\/>/<policy domain="resource" name="disk" value="8GiB"\/>/' \
+    /etc/ImageMagick-6/policy.xml 2>/dev/null || true
+
+# ============================================
+# Install Python packages
+# ============================================
+COPY requirements.txt /tmp/requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+# ============================================
+# Install yt-dlp binary (latest version)
+# ============================================
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+    -o /usr/local/bin/yt-dlp && \
+    chmod +x /usr/local/bin/yt-dlp
+
+# ============================================
+# Create app and data directory structure
+# ============================================
+RUN mkdir -p \
+    /app/scripts \
+    /app/templates \
+    /app/templates/fonts \
+    /app/config \
+    /data/output \
+    /data/cache \
+    /data/temp \
+    /data/logs
+
+WORKDIR /app
+
+# ============================================
+# Verify all installations
+# ============================================
+RUN echo "Verifying installations..." && \
+    ffmpeg -version | head -1 && \
+    yt-dlp --version && \
+    python3 --version && \
+    convert --version | head -1 && \
+    fc-list | grep -i liberation | head -3 && \
+    gallery-dl --version && \
+    echo "All tools verified!"
+
+# Keep container running — n8n executes commands via docker exec
+CMD ["tail", "-f", "/dev/null"]
