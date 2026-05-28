@@ -49,17 +49,10 @@ entryPoints:
       tls:
         certResolver: letsencrypt
 
-# ============================================
-# Certificate resolver (Let's Encrypt)
-# ============================================
-certificatesResolvers:
-  letsencrypt:
-    acme:
-      email: "${ACME_EMAIL}"
-      storage: /acme.json
-      # HTTP challenge — works without DNS access
-      httpChallenge:
-        entryPoint: web
+# NOTE: certificatesResolvers (ACME / Let's Encrypt) is intentionally NOT
+# configured here. It is configured exclusively via CLI args in docker-compose.yml
+# so that ${ACME_EMAIL} is properly substituted by Docker Compose.
+# See: docker-compose.yml → traefik → command section.
 
 # ============================================
 # Providers
