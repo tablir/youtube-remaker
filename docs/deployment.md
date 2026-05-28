@@ -137,10 +137,20 @@ make logs-whisper
 
 ## SSL Certificate
 
-Traefik obtains SSL certificate from Let's Encrypt automatically on first start.
-Certificate stored in `/data/traefik/acme.json`.
+Traefik obtains SSL certificates from Let's Encrypt using **DNS-01 challenge via Cloudflare**.
+
+**Requirements before first start:**
+- Domain DNS must be managed by Cloudflare
+- `CF_API_TOKEN` must be set in `.env` with scope `Zone → DNS → Edit` for the zone (e.g. `serial.tv`)
+- Create token at: `dash.cloudflare.com → My Profile → API Tokens → Create Token`
+
+Certificate is stored in `/data/traefik/acme.json`.
 
 **Important:** `acme.json` must always have `chmod 600` or Traefik refuses to start.
+
+**Why DNS-01 and not HTTP-01?**
+HTTP-01 challenge requires Let's Encrypt to reach port 80, which can conflict with
+IP whitelists. DNS-01 works entirely through Cloudflare API — no inbound HTTP needed.
 
 ---
 

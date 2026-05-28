@@ -35,6 +35,7 @@ echo "[1/6] Validating .env variables..."
 
 REQUIRED_VARS=(
     "ACME_EMAIL"
+    "CF_API_TOKEN"
     "N8N_HOST"
     "N8N_ENCRYPTION_KEY"
     "N8N_BASIC_AUTH_USER"
