@@ -91,6 +91,8 @@ services:
       # Fix for Traefik v3.0 + Docker API v1.40+ compatibility
       # Traefik defaults to API 1.24 which is rejected by Docker 24+
       DOCKER_API_VERSION: "1.41"
+      # Cloudflare API token for DNS-01 challenge (Zone:DNS:Edit on serial.tv)
+      CF_API_TOKEN: ${CF_API_TOKEN}
     volumes:
       # Read-only Docker socket — Traefik only needs to read container labels
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -106,7 +108,8 @@ services:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
       - "--log.level=WARN"
     labels:
       - "traefik.enable=false"
