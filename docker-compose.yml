@@ -219,6 +219,9 @@ services:
       PEXELS_API_KEY: ${PEXELS_API_KEY}
       PIXABAY_API_KEY: ${PIXABAY_API_KEY}
       STORYBLOCKS_API_KEY: ${STORYBLOCKS_API_KEY}
+      # YouTube API
+      YOUTUBE_CLIENT_ID: ${YOUTUBE_CLIENT_ID}
+      YOUTUBE_CLIENT_SECRET: ${YOUTUBE_CLIENT_SECRET}
       # Pipeline settings
       CLIPS_PER_SECOND: ${CLIPS_PER_SECOND:-4}
       DEFAULT_VOICE: ${DEFAULT_VOICE:-edge-tts}
@@ -258,7 +261,6 @@ services:
       - whisper_models:/data/models/whisper
       - pipeline_output:/data/output
       - pipeline_temp:/data/temp
-    command: tail -f /dev/null
     deploy:
       resources:
         limits:

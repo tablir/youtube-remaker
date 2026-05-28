@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "medium")
 WHISPER_DEVICE = os.getenv("WHISPER_DEVICE", "cpu")
 WHISPER_COMPUTE_TYPE = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
+WHISPER_LANGUAGE = os.getenv("WHISPER_LANGUAGE", "en")
 TEMP_DIR = "/data/temp"
 
 # ============================================
@@ -89,7 +90,7 @@ async def transcribe(file: UploadFile = File(...)):
         segments, info = model.transcribe(
             temp_path,
             beam_size=5,
-            language="en",
+            language=WHISPER_LANGUAGE,
             vad_filter=True,           # Filter out silence
             vad_parameters=dict(
                 min_silence_duration_ms=500

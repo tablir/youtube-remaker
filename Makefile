@@ -4,19 +4,19 @@
 
 # Start the entire system
 up:
-	docker-compose up -d
+	docker compose up -d
 
 # Start with image rebuild
 up-build:
-	docker-compose up -d --build
+	docker compose up -d --build
 
 # Stop the entire system
 down:
-	docker-compose down
+	docker compose down
 
 # Restart the entire system
 restart:
-	docker-compose down && docker-compose up -d
+	docker compose down && docker compose up -d
 
 # ============================================
 # Updates and deployment
@@ -25,16 +25,16 @@ restart:
 # Pull latest code from GitHub and restart
 pull:
 	git pull
-	docker-compose up -d --build
+	docker compose up -d --build
 
 # Update yt-dlp and gallery-dl only
 update-tools:
-	docker-compose exec pipeline pip install -U yt-dlp gallery-dl
+	docker compose exec pipeline pip install -U yt-dlp gallery-dl
 
 # Update n8n only
 update-n8n:
-	docker-compose pull n8n
-	docker-compose up -d n8n
+	docker compose pull n8n
+	docker compose up -d n8n
 
 # ============================================
 # Logs
@@ -42,23 +42,23 @@ update-n8n:
 
 # Logs for all containers
 logs:
-	docker-compose logs -f
+	docker compose logs -f
 
 # Logs for n8n only
 logs-n8n:
-	docker-compose logs -f n8n
+	docker compose logs -f n8n
 
 # Logs for pipeline only
 logs-pipeline:
-	docker-compose logs -f pipeline
+	docker compose logs -f pipeline
 
 # Logs for whisper only
 logs-whisper:
-	docker-compose logs -f whisper
+	docker compose logs -f whisper
 
 # Logs for postgres only
 logs-db:
-	docker-compose logs -f postgres
+	docker compose logs -f postgres
 
 # ============================================
 # Status and monitoring
@@ -66,7 +66,7 @@ logs-db:
 
 # Status of all containers
 status:
-	docker-compose ps
+	docker compose ps
 
 # CPU and RAM usage
 stats:
@@ -74,7 +74,7 @@ stats:
 
 # Run pipeline health check
 health:
-	docker-compose exec pipeline python scripts/healthcheck.py
+	docker compose exec pipeline python scripts/healthcheck.py
 
 # Disk usage
 disk:
@@ -106,14 +106,14 @@ size:
 
 # Full backup of all data
 backup:
-	tar -czf /data/backup_$(shell date +%Y%m%d_%H%M%S).tar.gz \
+	tar -czf /data/backup/backup_$(shell date +%Y%m%d_%H%M%S).tar.gz \
 		/data/n8n \
 		/data/postgres \
 		/data/cache
 
 # Export all n8n workflows to JSON
 backup-workflows:
-	docker-compose exec n8n n8n export:workflow \
+	docker compose exec n8n n8n export:workflow \
 		--all \
 		--output=/data/backup/workflows_$(shell date +%Y%m%d).json
 
@@ -123,11 +123,11 @@ backup-workflows:
 
 # Connect to PostgreSQL
 db:
-	docker-compose exec postgres psql -U n8n -d n8n
+	docker compose exec postgres psql -U n8n -d n8n
 
 # Backup PostgreSQL database
 backup-db:
-	docker-compose exec postgres pg_dump -U n8n n8n > \
+	docker compose exec postgres pg_dump -U n8n n8n > \
 		/data/backup/postgres_$(shell date +%Y%m%d_%H%M%S).sql
 
 # ============================================
@@ -154,12 +154,12 @@ env:
 # Import all workflows into n8n
 import-workflows:
 	for f in workflows/*.json; do \
-		docker-compose exec n8n n8n import:workflow --input=$$f; \
+		docker compose exec n8n n8n import:workflow --input=$$f; \
 	done
 
 # Export all workflows from n8n
 export-workflows:
-	docker-compose exec n8n n8n export:workflow \
+	docker compose exec n8n n8n export:workflow \
 		--all \
 		--output=/home/node/workflows/
 
