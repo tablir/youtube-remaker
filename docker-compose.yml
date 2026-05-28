@@ -18,8 +18,10 @@ x-logging: &default-logging
 
 networks:
   proxy:
+    name: proxy
     external: false
   internal:
+    name: internal
     external: false
 
 volumes:
