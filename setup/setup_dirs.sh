@@ -30,6 +30,12 @@ DIRS=(
     "/data/temp"
     "/data/backup"
     "/data/logs"
+    "/data/references/travel"
+    "/data/references/historical"
+    "/data/references/educational"
+    "/data/references/lifestyle"
+    "/data/references/news"
+    "/data/references/entertainment"
 )
 
 # Create directories (skip if already exists)
@@ -60,6 +66,7 @@ chmod -R 775 /data/temp
 chmod -R 775 /data/logs
 chmod -R 775 /data/models
 chmod -R 755 /data/backup
+chmod -R 775 /data/references
 
 echo ""
 echo "Permissions summary:"
