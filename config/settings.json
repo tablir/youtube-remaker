@@ -65,7 +65,7 @@
     "cache": "/data/cache",
     "temp": "/data/temp",
     "logs": "/data/logs",
-    "models": "/data/models"
+    "models": "/data/models/whisper"
   },
 
   "retry": {
