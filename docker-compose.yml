@@ -87,6 +87,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      # Fix for Traefik v3.0 + Docker API v1.40+ compatibility
+      # Traefik defaults to API 1.24 which is rejected by Docker 24+
+      DOCKER_API_VERSION: "1.41"
     volumes:
       # Read-only Docker socket — Traefik only needs to read container labels
       - /var/run/docker.sock:/var/run/docker.sock:ro
